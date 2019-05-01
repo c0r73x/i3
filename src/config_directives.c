@@ -322,10 +322,6 @@ CFGFUN(outline, const long size) {
     config.outline_size = size;
 }
 
-CFGFUN(outline, const long size) {
-    config.outline_size = size;
-}
-
 CFGFUN(floating_minimum_size, const long width, const long height) {
     config.floating_minimum_width = width;
     config.floating_minimum_height = height;

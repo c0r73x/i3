@@ -97,10 +97,6 @@ state OUTLINE:
   size = number
     -> call cfg_outline(&size)
 
-state OUTLINE:
-  size = number
-    -> call cfg_outline(&size)
-
 # floating_minimum_size <width> x <height>
 state FLOATING_MINIMUM_SIZE_WIDTH:
   width = number
