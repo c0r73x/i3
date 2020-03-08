@@ -2113,25 +2113,9 @@ void draw_bars(bool unhide) {
         if (binding.name && !config.disable_binding_mode_indicator) {
             workspace_width += logical_px(ws_spacing_px);
 
-            color_t fg_color = colors.binding_mode_fg;
-            color_t bg_color = colors.binding_mode_bg;
-
-            draw_util_rectangle(&(outputs_walk->buffer), colors.binding_mode_border,
-                                workspace_width,
-                                logical_px(1),
-                                binding.width + 2 * logical_px(ws_hoff_px) + 2 * logical_px(1),
-                                bar_height - 2 * logical_px(1));
-
-            draw_util_rectangle(&(outputs_walk->buffer), bg_color,
-                                workspace_width + logical_px(1),
-                                2 * logical_px(1),
-                                binding.width + 2 * logical_px(ws_hoff_px),
-                                bar_height - 4 * logical_px(1));
-
-            draw_util_text(binding.name, &(outputs_walk->buffer), fg_color, bg_color,
-                           workspace_width + logical_px(ws_hoff_px) + logical_px(1),
-                           bar_height / 2 - font.height / 2,
-                           binding.width);
+            int w = predict_button_width(binding.name_width);
+            draw_button(&(outputs_walk->buffer), colors.binding_mode_fg, colors.binding_mode_bg,
+                        colors.binding_mode_border, workspace_width, w, binding.name_width, binding.name);
 
             unhide = true;
             workspace_width += w;
