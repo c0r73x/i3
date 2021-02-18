@@ -101,7 +101,7 @@ void errorlog(char *fmt, ...)
 #if !defined(DLOG)
 void debuglog(char *fmt, ...)
     __attribute__((format(printf, 1, 2)));
-#define DLOG(fmt, ...) debuglog("%s:%s:%d - " fmt, STRIPPED__FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+#define DLOG(fmt, ...) debuglog("%s:%s:%d - " fmt, __FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 #endif
 
 /**
@@ -180,6 +180,12 @@ ssize_t writeall_nonblock(int fd, const void *buf, size_t count);
  *
  */
 ssize_t swrite(int fd, const void *buf, size_t count);
+
+/**
+ * Like strcasecmp but considers the case where either string is NULL.
+ *
+ */
+int strcasecmp_nullable(const char *a, const char *b);
 
 /**
  * Build an i3String from an UTF-8 encoded string.
@@ -341,7 +347,7 @@ gchar *g_utf8_make_valid(const gchar *str, gssize len);
  */
 uint32_t get_colorpixel(const char *hex) __attribute__((const));
 
-#ifndef HAVE_strndup
+#ifndef HAVE_STRNDUP
 /**
  * Taken from FreeBSD
  * Returns a pointer to a new string which is a duplicate of the
@@ -526,7 +532,7 @@ char *resolve_tilde(const char *path);
  */
 char *get_config_path(const char *override_configpath, bool use_system_paths);
 
-#ifndef HAVE_mkdirp
+#ifndef HAVE_MKDIRP
 /**
  * Emulates mkdir -p (creates any missing folders)
  *
@@ -537,9 +543,9 @@ int mkdirp(const char *path, mode_t mode);
 /** Helper structure for usage in format_placeholders(). */
 typedef struct placeholder_t {
     /* The placeholder to be replaced, e.g., "%title". */
-    char *name;
+    const char *name;
     /* The value this placeholder should be replaced with. */
-    char *value;
+    const char *value;
 } placeholder_t;
 
 /**
@@ -632,3 +638,27 @@ void draw_util_clear_surface(surface_t *surface, color_t color);
  */
 void draw_util_copy_surface(surface_t *src, surface_t *dest, double src_x, double src_y,
                             double dest_x, double dest_y, double width, double height);
+
+/**
+ * Puts the given socket file descriptor into non-blocking mode or dies if
+ * setting O_NONBLOCK failed. Non-blocking sockets are a good idea for our
+ * IPC model because we should by no means block the window manager.
+ *
+ */
+void set_nonblock(int sockfd);
+
+/**
+ * Creates the UNIX domain socket at the given path, sets it to non-blocking
+ * mode, bind()s and listen()s on it.
+ *
+ * The full path to the socket is stored in the char* that out_socketpath points
+ * to.
+ *
+ */
+int create_socket(const char *filename, char **out_socketpath);
+
+/**
+ * Checks if the given path exists by calling stat().
+ *
+ */
+bool path_exists(const char *path);

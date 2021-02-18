@@ -9,6 +9,8 @@
  */
 #include "all.h"
 
+#include <math.h>
+
 /*
  * Frees an i3Window and all its members.
  *
@@ -288,7 +290,7 @@ bool window_update_normal_hints(i3Window *win, xcb_get_property_reply_t *reply, 
         ASSIGN_IF_CHANGED(win->max_width, max_width);
         ASSIGN_IF_CHANGED(win->max_height, max_height);
     } else {
-        DLOG("Clearing maximum size \n");
+        DLOG("Clearing maximum size\n");
 
         ASSIGN_IF_CHANGED(win->max_width, 0);
         ASSIGN_IF_CHANGED(win->max_height, 0);
@@ -463,4 +465,22 @@ void window_update_motif_hints(i3Window *win, xcb_get_property_reply_t *prop, bo
 #undef MWM_DECOR_ALL
 #undef MWM_DECOR_BORDER
 #undef MWM_DECOR_TITLE
+}
+
+/*
+ * Updates the WM_CLIENT_MACHINE
+ *
+ */
+void window_update_machine(i3Window *win, xcb_get_property_reply_t *prop) {
+    if (prop == NULL || xcb_get_property_value_length(prop) == 0) {
+        DLOG("WM_CLIENT_MACHINE not set.\n");
+        FREE(prop);
+        return;
+    }
+
+    FREE(win->machine);
+    win->machine = sstrndup((char *)xcb_get_property_value(prop), xcb_get_property_value_length(prop));
+    LOG("WM_CLIENT_MACHINE changed to \"%s\"\n", win->machine);
+
+    free(prop);
 }
